@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Hub — mathmind</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #1a2230; --muted: #647080;
+    --line: #e3e7ee; --chipbg: #eef1f6;
+    --green: #1a7f4b; --green-bg: #e2f4ea;
+    --blue: #1d5fbf; --blue-bg: #e4edfb;
+    --amber: #935e0b; --amber-bg: #fbeed3;
+    --red: #b3372f; --red-bg: #fae4e2;
+    --gray: #5b6675; --gray-bg: #eceff3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161d; --card: #1a2029; --ink: #e6eaf1; --muted: #93a0b4;
+      --line: #2a3341; --chipbg: #232b37;
+      --green: #55c98a; --green-bg: #16311f;
+      --blue: #7aa9ef; --blue-bg: #182c4d;
+      --amber: #e5b566; --amber-bg: #3a2c10;
+      --red: #ef8e86; --red-bg: #45201d;
+      --gray: #a3adbd; --gray-bg: #262e3a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 24px clamp(16px, 4vw, 48px) 64px;
+  }
+  header { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+  h1 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
+  .sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { background: var(--chipbg); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+  .chip b { font-weight: 600; }
+  .chip.warn b { color: var(--amber); }
+  .chip.bad b { color: var(--red); }
+  .chip.good b { color: var(--green); }
+
+  nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+  nav button {
+    background: var(--card); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer;
+  }
+  nav button.on { border-color: var(--blue); color: var(--blue); background: var(--blue-bg); }
+  nav input {
+    background: var(--card); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 12px; font-size: 13px; min-width: 200px;
+  }
+
+  .attention-box {
+    background: var(--amber-bg); border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 24px;
+  }
+  .attention-box h2 { margin: 0 0 8px; font-size: 14px; color: var(--amber); text-transform: uppercase; letter-spacing: .06em; }
+  .attention-box ul { margin: 0; padding-left: 20px; }
+  .attention-box li { margin: 3px 0; }
+  .attention-box .tag { color: var(--muted); font-size: 12px; }
+
+  .group { margin-bottom: 28px; }
+  .group > h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .card.hide { display: none; }
+  .card-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .card-head h3 { margin: 0; font-size: 16px; }
+  .goal { color: var(--muted); font-size: 13px; margin: 0; }
+  .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); }
+
+  .pill { border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill.active      { color: var(--green); background: var(--green-bg); }
+  .pill.idle        { color: var(--gray);  background: var(--gray-bg); }
+  .pill.blocked     { color: var(--red);   background: var(--red-bg); }
+  .pill.attention   { color: var(--amber); background: var(--amber-bg); }
+  .pill.in-progress { color: var(--blue);  background: var(--blue-bg); }
+  .pill.queued      { color: var(--gray);  background: var(--gray-bg); }
+  .pill.done        { color: var(--green); background: var(--green-bg); }
+  .pill.failed      { color: var(--red);   background: var(--red-bg); }
+
+  .tasks { display: flex; flex-direction: column; gap: 6px; }
+  .task {
+    display: flex; gap: 8px; align-items: baseline; font-size: 13px;
+    border-top: 1px dashed var(--line); padding-top: 6px; flex-wrap: wrap;
+  }
+  .task .tid { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--muted); }
+  .task .agent { color: var(--muted); font-size: 12px; }
+  .task .title { flex: 1; min-width: 140px; }
+  .task .note { color: var(--muted); font-size: 12px; }
+  .bar { height: 4px; border-radius: 4px; background: var(--gray-bg); margin-top: 4px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--blue); }
+  .no-tasks { color: var(--muted); font-size: 13px; font-style: italic; }
+  .card-attention { font-size: 13px; color: var(--amber); }
+  .card-attention li { margin: 2px 0; }
+  .card-attention ul { margin: 0; padding-left: 18px; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Project Hub</h1>
+    <p class="sub">/Users/mathmind · managed by <code>~/claude-code</code> · data updated <b id="updated"></b> · page auto-reloads every 60s</p>
+  </div>
+  <div class="chips" id="summary"></div>
+</header>
+
+<nav id="filters">
+  <button data-f="all" class="on">All</button>
+  <button data-f="active">Active</button>
+  <button data-f="attention">Needs attention</button>
+  <button data-f="idle">Idle</button>
+  <input id="search" type="search" placeholder="Filter by name, path, goal…">
+</nav>
+
+<section id="attention-global"></section>
+<main id="groups"></main>
+<footer>Source of truth: <code>~/claude-code/tasks/*.md</code> + <code>PROJECTS.md</code>. The hub manager updates the DATA block in this file whenever the ledgers change.</footer>
+
+<script>
+/* ======================= DATA =======================
+   Maintained by the hub manager. Edit ONLY this block.
+   Mirror of tasks/ACTIVE.md, tasks/LOG.md, PROJECTS.md.
+   project.status: active | idle | blocked | attention
+   task.status: queued | in-progress | blocked | done | failed
+   task.progress: optional 0–100
+==================================================== */
+const DATA = {
+  generated: "2026-07-24",
+  attention: [
+    { project: "cursor/", text: "Contains coinminds-assistant / coinminds-hq copies — scout to check if they duplicate dev/coinminds* before anyone works there." },
+    { project: "registry", text: "PROJECTS.md was bootstrapped from the navigation map; per-project state (git health, build status) is unverified — send project-scout to active projects." },
+    { project: "claude-code", text: "Hub repo has no remote — create one (e.g. private GitHub repo) if you want ledger history backed up." }
+  ],
+  groups: [
+    {
+      name: "Coordination",
+      projects: [
+        {
+          id: "claude-code", title: "claude-code hub", path: "~/claude-code",
+          goal: "Manage and delegate work across all projects", worker: "manager",
+          status: "active",
+          tasks: [
+            { id: "T-000", title: "Bootstrap management hub", agent: "manager", status: "done", note: "2026-07-23" },
+            { id: "T-001", title: "Browser dashboard", agent: "manager", status: "done", note: "2026-07-24" }
+          ],
+          attention: []
+        },
+        {
+          id: "kakao-threads", title: "kakao-threads", path: "~/kakao-threads",
+          goal: "KakaoTalk thread dispatcher (peer coordinator — own ledgers)", worker: "—",
+          status: "active", tasks: [], attention: []
+        }
+      ]
+    },
+    {
+      name: "dev/ workspace",
+      projects: [
+        { id: "bls", title: "bls (+ admin)", path: "~/dev/bls", goal: "Property chatbot platform for Airbnb hosts", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "bn", title: "bn / ogbn", path: "~/dev/bn · ~/dev/ogbn", goal: "Financial charting apps (lightweight-charts)", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "coinminds", title: "coinminds (+ assistant)", path: "~/dev/coinminds*", goal: "Crypto backtesting / trading bot", worker: "python-worker", status: "idle", tasks: [], attention: ["Possible duplicate copies under ~/cursor/ — reconcile before major work"] },
+        { id: "wick", title: "wick_analyzer", path: "~/dev/wick_analyzer", goal: "Candlestick wick analysis tooling", worker: "python-worker", status: "idle", tasks: [], attention: [] },
+        { id: "crypto-demo", title: "crypto / demo", path: "~/dev/crypto · ~/dev/demo", goal: "Crypto site + Figma website demo", worker: "web-worker", status: "idle", tasks: [], attention: [] }
+      ]
+    },
+    {
+      name: "Flutter / mobile",
+      projects: [
+        { id: "silverfun", title: "Silvers Fun", path: "~/silver_fun_v3", goal: "Social/meetup app for seniors 65+ (Flutter + Firebase)", worker: "flutter-worker", status: "idle", tasks: [], attention: [] },
+        { id: "seniors", title: "seniors-app", path: "~/opus/seniors-app", goal: "Seniors app — Android (Gradle/Kotlin + Firebase functions)", worker: "flutter-worker", status: "idle", tasks: [], attention: [] },
+        { id: "flutter-misc", title: "Learning & scaffolds", path: "~/hello_world · ~/opus/test-mvp · flutter-starters · codelabs …", goal: "Flutter learning apps, starter scaffolds, reference codelabs", worker: "flutter-worker", status: "idle", tasks: [], attention: [] }
+      ]
+    },
+    {
+      name: "Web / storefronts",
+      projects: [
+        { id: "recto-web", title: "recto-web", path: "~/projects/recto/recto-web", goal: "Recto storefront SPA (React + Vite + Storybook)", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "recto-ssr", title: "Recto SSR storefronts", path: "~/projects/recto* · ~/projects/verycommon/recto-fable", goal: "Next.js storefront variants — recto-fable: dev→staging, main = prod", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "figma-extract", title: "figma-extraction", path: "~/projects/recto/figma-extraction", goal: "Figma asset/token extraction tooling", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "hftrading", title: "hftrading", path: "~/projects/hftrading", goal: "HF trading TypeScript library", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "shopify", title: "Shopify themes", path: "~/recto/recto-style-storefront · ~/2310/*", goal: "Dawn-based Liquid themes (recto-style, 2310 recto, k-fashion)", worker: "shopify-worker", status: "idle", tasks: [], attention: [] },
+        { id: "protos", title: "Static prototypes", path: "~/study/claude-design-demo · ~/rts", goal: "Plain-HTML design prototypes", worker: "web-worker", status: "idle", tasks: [], attention: [] }
+      ]
+    }
+  ]
+};
+/* ===================== END DATA ===================== */
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const allProjects = DATA.groups.flatMap(g => g.projects);
+
+function effectiveStatus(p) {
+  if (p.status === "blocked" || p.tasks.some(t => t.status === "blocked")) return "blocked";
+  if (p.status === "attention" || (p.attention && p.attention.length)) return "attention";
+  if (p.status === "active" || p.tasks.some(t => t.status === "in-progress" || t.status === "queued")) return "active";
+  return "idle";
+}
+
+function renderSummary() {
+  const open = allProjects.flatMap(p => p.tasks).filter(t => ["queued","in-progress"].includes(t.status)).length;
+  const blocked = allProjects.flatMap(p => p.tasks).filter(t => t.status === "blocked").length
+                + allProjects.filter(p => p.status === "blocked").length;
+  const attn = DATA.attention.length + allProjects.reduce((n,p) => n + (p.attention?.length||0), 0);
+  document.getElementById("summary").innerHTML =
+    `<span class="chip"><b>${allProjects.length}</b> projects</span>` +
+    `<span class="chip good"><b>${open}</b> open tasks</span>` +
+    `<span class="chip ${blocked ? "bad" : ""}"><b>${blocked}</b> blocked</span>` +
+    `<span class="chip ${attn ? "warn" : ""}"><b>${attn}</b> attention items</span>`;
+}
+
+function renderGlobalAttention() {
+  const el = document.getElementById("attention-global");
+  if (!DATA.attention.length) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="attention-box"><h2>Needs handling</h2><ul>` +
+    DATA.attention.map(a => `<li>${a.project ? `<span class="tag">[${esc(a.project)}]</span> ` : ""}${esc(a.text)}</li>`).join("") +
+    `</ul></div>`;
+}
+
+function taskRow(t) {
+  const bar = (t.progress != null && t.status === "in-progress")
+    ? `<div class="bar"><i style="width:${Math.max(0,Math.min(100,t.progress))}%"></i></div>` : "";
+  return `<div class="task">
+    <span class="tid">${esc(t.id)}</span>
+    <span class="title">${esc(t.title)}${bar}</span>
+    <span class="agent">${esc(t.agent || "")}</span>
+    <span class="pill ${esc(t.status)}">${esc(t.status)}</span>
+    ${t.note ? `<span class="note">${esc(t.note)}</span>` : ""}
+  </div>`;
+}
+
+function renderGroups() {
+  document.getElementById("groups").innerHTML = DATA.groups.map(g => `
+    <section class="group"><h2>${esc(g.name)}</h2><div class="grid">` +
+    g.projects.map(p => {
+      const st = effectiveStatus(p);
+      return `<article class="card" data-status="${st}" data-text="${esc((p.title+" "+p.path+" "+p.goal).toLowerCase())}">
+        <div class="card-head"><h3>${esc(p.title)}</h3><span class="pill ${st}">${st}</span></div>
+        <p class="goal">${esc(p.goal)}</p>
+        <div class="path">${esc(p.path)} · ${esc(p.worker)}</div>
+        ${p.attention && p.attention.length ? `<div class="card-attention"><ul>${p.attention.map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>` : ""}
+        <div class="tasks">${p.tasks.length ? p.tasks.map(taskRow).join("") : `<span class="no-tasks">No tasks on the ledger</span>`}</div>
+      </article>`;
+    }).join("") + `</div></section>`).join("");
+}
+
+let filter = "all";
+function applyFilter() {
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  document.querySelectorAll(".card").forEach(c => {
+    const okStatus = filter === "all" || c.dataset.status === filter ||
+      (filter === "attention" && c.dataset.status === "blocked");
+    const okText = !q || c.dataset.text.includes(q);
+    c.classList.toggle("hide", !(okStatus && okText));
+  });
+}
+document.getElementById("filters").addEventListener("click", e => {
+  if (!e.target.dataset.f) return;
+  filter = e.target.dataset.f;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b === e.target));
+  applyFilter();
+});
+document.getElementById("search").addEventListener("input", applyFilter);
+
+document.getElementById("updated").textContent = DATA.generated;
+renderSummary(); renderGlobalAttention(); renderGroups();
+
+const savedScroll = sessionStorage.getItem("hub-scroll");
+if (savedScroll) window.scrollTo(0, +savedScroll);
+setTimeout(() => { sessionStorage.setItem("hub-scroll", String(window.scrollY)); location.reload(); }, 60000);
+</script>
+</body>
+</html>
