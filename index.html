@@ -152,8 +152,7 @@
 const DATA = {
   generated: "2026-07-24",
   attention: [
-    { project: "cursor/", text: "Contains coinminds-assistant / coinminds-hq copies — scout to check if they duplicate dev/coinminds* before anyone works there." },
-    { project: "registry", text: "PROJECTS.md was bootstrapped from the navigation map; per-project state (git health, build status) is unverified — send project-scout to active projects." },
+    { project: "registry", text: "Per-project state (git health, build status) unverified for dev/ and Flutter projects — scout them if they become active again." },
     { project: "claude-code", text: "Hub repo has no remote — create one (e.g. private GitHub repo) if you want ledger history backed up." }
   ],
   groups: [
@@ -162,13 +161,21 @@ const DATA = {
       projects: [
         {
           id: "claude-code", title: "claude-code hub", path: "~/claude-code",
-          goal: "Manage and delegate work across all projects", worker: "manager",
+          goal: "Manage and delegate work — focus: Recto + OUJOU", worker: "manager",
           status: "active",
           tasks: [
             { id: "T-000", title: "Bootstrap management hub", agent: "manager", status: "done", note: "2026-07-23" },
-            { id: "T-001", title: "Browser dashboard", agent: "manager", status: "done", note: "2026-07-24" }
+            { id: "T-001", title: "Browser dashboard", agent: "manager", status: "done", note: "2026-07-24" },
+            { id: "T-002", title: "Deploy to agent.gunho.ai (HTTPS)", agent: "manager", status: "done", note: "2026-07-24" },
+            { id: "T-003", title: "검삔은퇴 countdown", agent: "manager", status: "done", note: "2026-07-24" },
+            { id: "T-004", title: "Refocus: coinminds→Cursor, OUJOU added", agent: "manager", status: "done", note: "2026-07-24" }
           ],
           attention: []
+        },
+        {
+          id: "oujou", title: "OUJOU", path: "—",
+          goal: "New project — details TBD, kickoff pending", worker: "—",
+          status: "idle", tasks: [], attention: []
         },
         {
           id: "kakao-threads", title: "kakao-threads", path: "~/kakao-threads",
@@ -178,11 +185,21 @@ const DATA = {
       ]
     },
     {
+      name: "Recto / storefronts — focus",
+      projects: [
+        { id: "recto-web", title: "recto-web", path: "~/projects/recto/recto-web", goal: "Recto storefront SPA (React + Vite + Storybook)", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "recto-ssr", title: "Recto SSR storefronts", path: "~/projects/recto* · ~/projects/verycommon/recto-fable", goal: "Next.js storefront variants — recto-fable: dev→staging, main = prod", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "figma-extract", title: "figma-extraction", path: "~/projects/recto/figma-extraction", goal: "Figma asset/token extraction tooling", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "shopify", title: "Shopify themes", path: "~/recto/recto-style-storefront · ~/2310/*", goal: "Dawn-based Liquid themes (recto-style, 2310 recto, k-fashion)", worker: "shopify-worker", status: "idle", tasks: [], attention: [] },
+        { id: "hftrading", title: "hftrading", path: "~/projects/hftrading", goal: "HF trading TypeScript library", worker: "web-worker", status: "idle", tasks: [], attention: [] },
+        { id: "protos", title: "Static prototypes", path: "~/study/claude-design-demo · ~/rts", goal: "Plain-HTML design prototypes", worker: "web-worker", status: "idle", tasks: [], attention: [] }
+      ]
+    },
+    {
       name: "dev/ workspace",
       projects: [
         { id: "bls", title: "bls (+ admin)", path: "~/dev/bls", goal: "Property chatbot platform for Airbnb hosts", worker: "web-worker", status: "idle", tasks: [], attention: [] },
         { id: "bn", title: "bn / ogbn", path: "~/dev/bn · ~/dev/ogbn", goal: "Financial charting apps (lightweight-charts)", worker: "web-worker", status: "idle", tasks: [], attention: [] },
-        { id: "coinminds", title: "coinminds (+ assistant)", path: "~/dev/coinminds*", goal: "Crypto backtesting / trading bot", worker: "python-worker", status: "idle", tasks: [], attention: ["Possible duplicate copies under ~/cursor/ — reconcile before major work"] },
         { id: "wick", title: "wick_analyzer", path: "~/dev/wick_analyzer", goal: "Candlestick wick analysis tooling", worker: "python-worker", status: "idle", tasks: [], attention: [] },
         { id: "crypto-demo", title: "crypto / demo", path: "~/dev/crypto · ~/dev/demo", goal: "Crypto site + Figma website demo", worker: "web-worker", status: "idle", tasks: [], attention: [] }
       ]
@@ -196,14 +213,9 @@ const DATA = {
       ]
     },
     {
-      name: "Web / storefronts",
+      name: "External — Cursor-managed",
       projects: [
-        { id: "recto-web", title: "recto-web", path: "~/projects/recto/recto-web", goal: "Recto storefront SPA (React + Vite + Storybook)", worker: "web-worker", status: "idle", tasks: [], attention: [] },
-        { id: "recto-ssr", title: "Recto SSR storefronts", path: "~/projects/recto* · ~/projects/verycommon/recto-fable", goal: "Next.js storefront variants — recto-fable: dev→staging, main = prod", worker: "web-worker", status: "idle", tasks: [], attention: [] },
-        { id: "figma-extract", title: "figma-extraction", path: "~/projects/recto/figma-extraction", goal: "Figma asset/token extraction tooling", worker: "web-worker", status: "idle", tasks: [], attention: [] },
-        { id: "hftrading", title: "hftrading", path: "~/projects/hftrading", goal: "HF trading TypeScript library", worker: "web-worker", status: "idle", tasks: [], attention: [] },
-        { id: "shopify", title: "Shopify themes", path: "~/recto/recto-style-storefront · ~/2310/*", goal: "Dawn-based Liquid themes (recto-style, 2310 recto, k-fashion)", worker: "shopify-worker", status: "idle", tasks: [], attention: [] },
-        { id: "protos", title: "Static prototypes", path: "~/study/claude-design-demo · ~/rts", goal: "Plain-HTML design prototypes", worker: "web-worker", status: "idle", tasks: [], attention: [] }
+        { id: "coinminds", title: "coinminds (all lineages)", path: "~/dev/coinminds* · ~/cursor/coinminds*", goal: "Crypto backtesting / trading — handed off to Cursor 2026-07-24; hub does not touch", worker: "cursor", status: "idle", tasks: [], attention: [] }
       ]
     }
   ]
